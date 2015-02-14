@@ -1,0 +1,15 @@
+dependencies:
+- rpm:
+  - python${py3}
+- rpm:
+  - glade
+  - gtk3
+  - pygobject2
+  - pygobject3
+devassistant_version: 0.9.3
+original_kwargs:
+  github: !!python/unicode 'sptankard'
+  name: !!python/unicode '/home/scott/Documents/Tech/csv-ofi/csvdove'
+project_type:
+- python
+- gtk3
