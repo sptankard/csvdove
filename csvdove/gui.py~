@@ -1,0 +1,12 @@
+class GUI(object):
+    def __init__(self):
+        self.selected_schema_file = schema_file
+        pass
+
+    def main(self):
+        pas
+        
+    def process(self):
+        pass
+
+    

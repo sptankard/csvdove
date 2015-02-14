@@ -1,0 +1,20 @@
+
+
+class CSV(object):
+    def __init__(self, csvfile):
+        pass
+
+
+class CSVHeader(object):
+    def __init__(self, csvfile):
+        get first_row
+        sniff first row
+        if header-like:
+            return first_row
+        else:
+            return None
+    
+class CSVData(object):
+    def __init__(self, csvfile, has_header):
+        pass
+ 

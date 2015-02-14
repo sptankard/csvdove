@@ -1,0 +1,155 @@
+
+'''csvdove - dovetails csv files according to custom-defined config
+
+Config files must contain info on one (or more) source(s), and on a
+target format.
+
+First, if performs a realignment of the source columns: prunes, fills
+gaps, renames, and finally orders for output.
+
+Next:
+cleanup
+case, bool
+split first last names etc
+lookup states?
+
+CLASSES:
+Source
+Target
+Schema (wraps Source and Target)
+DB
+SourceFile
+TargetFile
+'''
+import os, subprocess
+#import six
+
+try:
+    from sqlite3 import dbapi2 as sqlite # python 2.5
+except:
+    try:
+        from pysqlite2 import dbapi2 as sqlite
+    except:
+        print 'This program requires pysqlite2\n',\
+            'http://initd.org/tracker/pysqlite/'
+        sys.exit(1)
+
+import config
+#import schema
+
+from data import to_str
+
+import data 
+data = data.DataWrapper(config, 'target.csv', ['seamless.csv'])
+t = data.schema.target
+s = data.source_files[0].corresponding_source
+#schema = schema.Schema(config)
+#t = schema.t
+#s = schema.s
+
+# f = Files() #what args?
+#wh_file = f.sources.current
+wh_file = config.file_name
+
+list_for_kit = to_str(s.keep)
+
+def cli_exec(cmd):
+    pipe = subprocess.Popen(cmd, stdout=subprocess.PIPE,
+                            stdin=subprocess.PIPE, shell=True)
+    #stdout = pipe.stdout.read()
+    return pipe.stdout.read()
+
+def get_keepers(keeper_list, file_name):
+    # Things of the sort: csvcut -c "Date","First Name" ./seamless.csv
+    #cmd = 'csvcut -c ' + keeper_list + ' ' + file_name
+    # IMPROVEMENT NOTE: i can integrate list->string conversion w/in this function
+    # NOTE: i can move this operation to SQL
+    cmd_cut = 'csvcut -c %s %s' % (keeper_list, file_name)
+    return cli_exec(cmd_cut)
+
+db_name = config.db_name
+db_path = 'sqlite:///' + db_name
+table = s.name
+
+def rm_db(x):
+    if os.path.exists(x):
+        os.remove(x)
+
+def setup_db(data):
+    '''this function should take as arg the output of get_keepers()
+    it could also take as arg any csv file,
+    e.g. if later get_keepers() functionality is moved to sql'''
+    rm_db(db_name) # delete the db iff it already exists
+    cmd_import_data = 'csvsql --db %s --table %s --insert' % (db_path, table)
+    p = subprocess.Popen(cmd_import_data, stdout=subprocess.PIPE,
+                         stdin=subprocess.PIPE, shell=True)
+    p.communicate(input = data)
+
+def add_cols(add_list):
+    # syntax: ALTER TABLE name ADD COLUMN name type
+    # type: text
+    # quotes around name to deal with whitespace...
+    connection = sqlite.connect(db_name)
+    cursor = connection.cursor()
+    for col_name in add_list:
+        sql_add_col = 'ALTER TABLE %s ADD COLUMN \"%s\"' % (table, col_name)
+        cursor.execute(sql_add_col)
+
+def export_db():
+    # export the sql db to csv (not yet in correct order)
+    cmd_export_data = 'sql2csv --db %s --query \"select * from %s\"' % (db_path, table)
+    csv_output = cli_exec(cmd_export_data)
+    return csv_output
+
+def rename_cols(matching, data):
+    '''rename the discrepancy headers
+    matching: a list of lists that match [source, target] cols
+    data: the csv-text data to operate on
+    '''
+    pairs = matching # i have to get a list of tuples from the list
+    # prune out the ones that are already the same
+    pruned = [ (key, val) for key, val in pairs if key != val ]
+    header = data # maybe restrict this to just first line
+    for key, val in pruned:
+        k = ',' + key + ','
+        v = ',' + val + ','
+        header = header.replace(k, v, 1) # just replace once
+    return header
+
+    # goddamn sqlite don't support this shit
+    '''connection = sqlite.connect(db_name)
+    cursor = connection.cursor()
+    ...
+    #syntax: ALTER TABLE table_name RENAME COLUMN old_name to new_name;
+    sql_rename_cols = 'ALTER TABLE %s RENAME COLUMN \"%s\" to \"%s\"' % (table, key, val)
+    #cursor.execute(sql_rename_cols)
+    '''
+
+def order_for_target(data):
+    # expects csv input with all requisite columns, in any order
+    # returns csv data in desired order
+    target_list = to_str(t.cols)
+    cmd_cut_for_target = 'csvcut -c %s' % (target_list)
+    p = subprocess.Popen(cmd_cut_for_target, stdout=subprocess.PIPE,
+                         stdin=subprocess.PIPE, shell=True)
+    output = p.communicate(input = data)[0] # first element is stdoutdata
+    return output
+
+def do_db_work():
+    keeper_data = get_keepers(list_for_kit, wh_file)
+    setup_db(keeper_data)
+    add_cols(s.add)
+    csv = export_db().encode()
+    renamed = rename_cols(s.match, csv)
+    ordered = order_for_target( renamed )
+    rm_db(db_name)
+    return ordered
+
+print 'NOTE: this is a test config\n------'
+print 'ORDERED:\n' + do_db_work().encode()
+
+# subprocess.call('python helloshell.py')
+# subprocess.call('cmd /C "type helloshell.py"')
+# pipe = subprocess.Popen('python helloshell.py', stdout=subprocess.PIPE
+# p = subprocess.Popen('ls', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+# retval = p.wait()
