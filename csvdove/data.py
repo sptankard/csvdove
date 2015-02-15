@@ -20,8 +20,8 @@ def subtract_lists(x, y):
 
 def schema_from_file_path(file_path):
     import yaml
-    s = yaml.load(file(file_path))
-    return Schema(s) 
+    c = yaml.load(file(file_path))
+    return Schema(c) 
 
 def search_schemas_dir():
     '''Returns a list of .yml files in ~/.csvdove/saved_schemas

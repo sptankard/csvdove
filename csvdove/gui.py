@@ -107,10 +107,11 @@ class GUI(object):
         '''Called when user selects 'Add schema file...' (Schema selector
         drop-down.)
         '''
-        # gtk only has a path
-        # from the path, gui needs to:
-        # 1) decode file (c = yaml.load())
-        # 2) load schema object into memory (Schema(c))
+        # gui needs to:
+        # data.schema_from_file_path()
+        # set schema to active
+        # reevaluate src files wrt new schema
+        
         pass
 
     def rm_schema_file(self):

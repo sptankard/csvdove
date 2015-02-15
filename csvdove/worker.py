@@ -32,6 +32,7 @@ class Worker(object):
             ordered = restructure.order(self.data.schema.target.cols, renamed)
 
             db.clear()
+
             # should the db deletion be in or out the loop? If it is
             # out-loop, there could be data mixing (db would not
             # simply be written over, but appended to etc?)
@@ -54,6 +55,7 @@ class Worker(object):
             # backend is used, there is only one db per system?)
 
             self.data.target_file.write(ordered)
+
             # Note. For stdout: putting this in-loop works, but
             # nothing is actually written out until all the loops have
             # finished. (Then the output for all the files shows up at
