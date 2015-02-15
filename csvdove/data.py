@@ -62,10 +62,14 @@ This only concernes --gen.
 class DataWrapper(object):
     '''Wraps up the data for use: 
     (1) a schema (with source and target description), and
-    (2) files (schema file, source files, and target file location).'''
+    (2) files (schema file, source files, and target file location).
+    
+    A DataWrapper instance is provided as the arg to a Worker instance.
+    '''
     def __init__(self, schema_file, target_file, list_of_source_files):
         self.schema = Schema(schema_file)
-        self.schema_file_path = schema_file
+        self.schema_file_path = schema_file # is this actually a path,
+                                            # or a file object?
         
         self.target_file = target_file
         
@@ -81,13 +85,18 @@ class DataWrapper(object):
 
 class Schema(object):
     '''Jumper point for Target and Source* classes.
-    Loads a config and instantiates a Target and a list of Sources.
+    Loads a schema and instantiates a Target and a list of Sources.
     '''
     def __init__(self, schema_data):
-        #self.target = Target(schema_data.target)
-        self.target = Target(schema_data['target'])
+        # need to overhaul the dot notation vs dict access. ATM, it
+        # works in Target and Source but not in Schema. Wait for
+        # loading from yaml first...
+        
+        self.target = Target(schema_data.target)
+        #self.target = Target(schema_data['target'])
         self.sources = []
-        for each_source in schema_data['sources']:        
+        for each_source in schema_data.sources:        
+        #for each_source in schema_data['sources']:
             s = Source(each_source, self.target)
             self.sources.append(s)
 
@@ -138,6 +147,10 @@ class SourceFile(object):
         Read the file and find some stuff out about it.
         Compare it to the source descriptions in the schema and find
         its matching definition.
+
+        The GUI keeps and updates (add/remove, disactivate if no match
+        in schema) a list of SourceFile objects.
+
         '''
         self.path = file_path
 

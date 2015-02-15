@@ -43,7 +43,7 @@ class Schema(object):
             self.sources.append(s)
  
 class Source(object):
-    '''instantiate source on a dict()'''
+    # instantiate source on a dict()
     def __init__(self, s, t):
             self.name = s['name']
             self.cols = s['cols']

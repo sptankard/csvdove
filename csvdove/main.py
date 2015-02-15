@@ -73,7 +73,7 @@ class CSVDove(object):
                           help='CSV file to pattern for target format\
                             (required if using --gen)')
 
-        dove.add_argument('-v, --version', action='version', version='%(prog)s 2.0')
+        dove.add_argument('-v, --version', action='version', version='%(prog)s 0.0.1')
         
         self.args = dove.parse_args()
         
@@ -94,7 +94,6 @@ class CSVDove(object):
         elif self.args.list == True:
             import data
             for fn in data.search_schemas_dir():
-                #print os.path.abspath(fn)
                 print fn         
 
         else:

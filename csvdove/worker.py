@@ -31,10 +31,49 @@ class Worker(object):
             renamed = restructure.rename_cols( each_file.schema_corr.match, csv )
             ordered = restructure.order(self.data.schema.target.cols, renamed)
 
-            db.clear() # should this be in or out the loop?
+            db.clear()
+            # should the db deletion be in or out the loop? If it is
+            # out-loop, there could be data mixing (db would not
+            # simply be written over, but appended to etc?)
             
-        # must catch the (ordered) output for each csv file, and stack it into one file (csvstack?)
-        self.data.target_file.write(ordered)
+            # Need to figure out how to deal with multiple source
+            # files of the same type. As it is, DB is created, used
+            # and deleted for each file. This is probably simpler, but
+            # might there be some benefit to grouping files of the
+            # same src type together, and using one db table for them?
+            # Also, i can use one DB for all the data, and separate
+            # src types by table (or by file...), but is this desirable?
+            
+            # ...would use more disk space, for the db (but possibly
+            # less RAM.) However, would require more RAM for the final
+            # step, because writing operations could have to deal with
+            # the output of several src files at once. As such, I
+            # think each file should use a separate db file.
+
+            # (Note this is doable only for sqlite, if another db
+            # backend is used, there is only one db per system?)
+
+            self.data.target_file.write(ordered)
+            # Note. For stdout: putting this in-loop works, but
+            # nothing is actually written out until all the loops have
+            # finished. (Then the output for all the files shows up at
+            # once.) This means that the entire output has to be held in memory.
+
+            # Writing to sys.stdout must implement some sort of
+            # buffer. Q: does writing to a file implement a buffer
+            # too? But for a file, would this append like for stdout, or overwrite each time?
+
+            # Conclusion: write (at least for stdout) in python
+            # automatically implements a sequential process. So it
+            # doesn't get overwritten.
+
+            # This works for now; it is simpler to implement. However,
+            # since it takes more RAM, it may be better to implement a
+            # truly sequential process, write, process, write/append, etc
+
+            # Also. I don't think using csvstack would make it any
+            # simpler. It probably just implements a file write-append
+            # that would be a python one-liner. However, look at the csvstack code for reference.
 
 class DB(object):
     def __init__(self):
