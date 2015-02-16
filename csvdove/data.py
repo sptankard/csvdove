@@ -13,6 +13,20 @@ import yaml
 from main import to_str
 # can prob move to_str into data for good
 
+def get_default_schema_file_path():
+    # This could conceivable be used by CLI too. (Call this function
+    # in the sysargs const=)
+    '''Figure out the path for what the default schema file should
+    be. Returns a str for this path.
+
+    Steps:
+    (2) check config for last_schema_selected
+    (3) scan schemas dir and pick first one
+    (4) failing that, set to None
+
+    '''
+    pass
+
 def subtract_lists(x, y):
     #alt but different: z = list(set(x) - set(y))
     z = [item for item in x if item not in y]
@@ -107,7 +121,23 @@ class Target(object):
         #self.name = target[0]
         self.cols = target['cols']
         #self.cols = target[1]
+    
+    def autogen_output_path():
+        '''maybe this should be handled in OutputFile class?    
         
+        Returns string of the sort: ~/TARGET_NAME.csvdove_DATETIME.csv
+        
+        It needs access to the target definition name as per the active schema.
+        
+        '''
+        import time
+        tn = self.name
+        appn = 'csvdove' # %prog
+        dt = time.strftime('%Y%m%d_%H:%M:%S') 
+        
+        file_output_path = '%s.%s_%s.csv' % (tn, appn, dt)
+        return file_output_path
+
 class Source(object):
     '''Represents a source description from a schema.
     Derives useful info above and beyond the data stored in the schema

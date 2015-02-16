@@ -1,36 +1,3 @@
-
-def autogen_output_path():
-    '''maybe this should be handled in data.OutputFile class?    
-    
-    Maybe this function call should go straight in the sysargs
-    definition? No. CLI needs to recieve args.output if given. Only
-    GUI needs to autogenerate.
-
-    Returns string of the sort: ~/TARGET_NAME.csvdove_DATETIME.csv
-
-    '''
-    import time
-    tn = 'gdoc' #data.schema.target.name
-    appn = 'csvdove' # %prog
-    dt = time.strftime('%Y%m%d_%H:%M:%S') 
-    
-    file_output_path = '%s.%s_%s.csv' % (tn, appn, dt)
-    return file_output_path
-
-def get_default_schema_file_path():
-    # This could conceivable be used by CLI too. (Call this function
-    # in the sysargs const=)
-    '''Figure out the path for what the default schema file should
-    be. Returns a str for this path.
-
-    Steps:
-    (2) check config for last_schema_selected
-    (3) scan schemas dir and pick first one
-    (4) failing that, set to None
-
-    '''
-    pass
-
 class GUI(object):
     #GUI needs to have optional args (-c, -s, -o)
     #def __init__(self, **kwargs):
