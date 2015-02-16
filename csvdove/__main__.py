@@ -124,12 +124,6 @@ if __name__ == '__main__':
     dove = CSVDove()
     dove.main()
 
-# subprocess.call('python helloshell.py')
-# subprocess.call('cmd /C "type helloshell.py"')
-# pipe = subprocess.Popen('python helloshell.py', stdout=subprocess.PIPE
-# p = subprocess.Popen('ls', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-# retval = p.wait()
-
 '''
 TODO
 td schema

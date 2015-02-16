@@ -77,10 +77,8 @@ class DataWrapper(object):
     
     A DataWrapper instance is provided as the arg to a Worker instance.
     '''
-    # note; parallelism is somewhat broken. Need to decide whether
-    # DataWrapper should call Schema and Source or SchemaFile and
-    # SourceFile.
-    def __init__(self, schema_file, target_file, list_of_source_files):
+
+    def __init__(self, schema_file, output_file, list_of_source_files):
 
         # is this inefficiently loading two file obj in memory at
         # once? (one from the cli arg -c, then getting its name and
@@ -89,17 +87,12 @@ class DataWrapper(object):
         cf = SchemaFile(self.schema_file_path)
         self.schema = cf.load()
 
-        self.target_file = target_file
+        self.output_file = output_file
         
         self.source_files = []
         for each_source_file in list_of_source_files:
             sf = SourceFile(each_source_file, self.schema)
             self.source_files.append(sf)
-
-#each of the things that Schema is getting fed in  are
-#schema.sources is a list
-#it should be a list of dicts,
-#not a list of lists
 
 class Schema(object):
     '''Jumper point for Target and Source* classes.
@@ -120,10 +113,8 @@ class Target(object):
     '''
     def __init__(self, target):
         self.name = target['name']
-        #self.name = target[0]
         self.cols = target['cols']
-        #self.cols = target[1]
-    
+
     def autogen_output_path():
         '''maybe this should be handled in OutputFile class?    
         
