@@ -1,9 +1,0 @@
-class DB(object):
-    def __init__(self):
-        self.name = ''
-        self.path = ''
-        #table* - derive for each sourcefile
-        
-    #functions: rename_cols, add_cols, get_salvage_cols
-    
-        
