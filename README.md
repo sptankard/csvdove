@@ -30,8 +30,8 @@ and a better one at that, but they are under-staffed and over-worked
 as it is, and investing in revamping their website infrastructure is
 off the table…) At the end of every month, they export the data from
 these e-commerce plugins to combine it, sort it, and import portions
-of it into a general-purpose database (their donor database; their
-general records). This is a long, monotonous, error-prone process.
+of it into a general-purpose database. This is a long, monotonous,
+error-prone process.
 
 csvdove can help with this. Someone at the non-profit can create a
 "schema" file describing the data that each e-commerce plugin exports,
