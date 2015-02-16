@@ -10,7 +10,7 @@ except:
             'http://initd.org/tracker/pysqlite/'
         sys.exit(1)
 
-from main import to_str
+from csvdove.__main__ import to_str
         
 class Dovetail(object):
     def __init__(self, data):
@@ -207,7 +207,7 @@ class StarterSchemaGen(object):
     pattern one or more source files, and a target file.'''
     def __init__(self, target, sources):
         # get headers out of the CSV files...
-        import handler
+        from csvdove import handler
 
         # first, the target file
         t_header = handler.CSVHeader(open(target))

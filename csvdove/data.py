@@ -10,7 +10,7 @@ As such, making schema config files is easier. The rest of the needed
 data is then derived from computing on this base info.
 '''
 import yaml
-from main import to_str
+from csvdove.__main__ import to_str
 # can prob move to_str into data for good
 
 def get_default_schema_file_path():

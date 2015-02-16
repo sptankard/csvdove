@@ -9,8 +9,8 @@ class CLI(object):
         self.output_file = o
     
     def main(self):
-        from data import DataWrapper
-        from worker import Dovetail
+        from csvdove.data import DataWrapper
+        from csvdove.worker import Dovetail
         data = DataWrapper(self.schema_file, self.output_file,
                            self.source_files_list)
         d = Dovetail(data)

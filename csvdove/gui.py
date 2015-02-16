@@ -37,7 +37,7 @@ class GUI(object):
         # you can only call process if you have all the args (means
         # have to check for SourceFiles and active SchemaFile)
         data = DataWrapper(self.selected_schema_file, self.target_file, self.source_files_list)
-        from .worker import Dovetail
+        from csvdove.worker import Dovetail
         d = Dovetail(data)
         d.main()
 
@@ -60,7 +60,7 @@ class GUI(object):
         active SchemaFile.
         '''
         self.selected_schema_file = self.get_file_path_from_widget()
-        import data
+        from csvdove import data
         data.schema_from_file_path(self.selected_schema_file)
     
         # Everytime you change a schema, it should reevaluate the
