@@ -12,7 +12,7 @@ except:
 
 from main import to_str
         
-class Worker(object):
+class Dovetail(object):
     def __init__(self, data):
         self.data = data
 

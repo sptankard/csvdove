@@ -10,11 +10,11 @@ class CLI(object):
     
     def main(self):
         from data import DataWrapper
-        from worker import Worker
+        from worker import Dovetail
         data = DataWrapper(self.schema_file, self.output_file,
                            self.source_files_list)
-        w = Worker(data)
-        w.main()
+        d = Dovetail(data)
+        d.main()
 
 
         
