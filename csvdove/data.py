@@ -14,8 +14,6 @@ from main import to_str
 # can prob move to_str into data for good
 
 def get_default_schema_file_path():
-    # This could conceivable be used by CLI too. (Call this function
-    # in the sysargs const=)
     '''Figure out the path for what the default schema file should
     be. Returns a str for this path.
 
@@ -25,6 +23,10 @@ def get_default_schema_file_path():
     (4) failing that, set to None
 
     '''
+    # ATM, only applies to the gui, which reads from the
+    # .csvdove/saved_schemas dir. On cli, all this is manual
+    # (-c). This could conceivable be used by CLI too. (Call this
+    # function in the sysargs const=)
     pass
 
 def subtract_lists(x, y):
