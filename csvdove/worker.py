@@ -84,15 +84,17 @@ class DB(object):
         os.path.expanduser(path)
         os.path.join(path, *paths)
 
-
         dbf = os.tmpfile()
         dbfn = os.path.abspath(dbf)
 
         or use: import tmpfile ?
         '''
+        # should change this to use: tempfile.SpooledTemporaryFile
+        # complication: get it to persist between calls
         self.name = 'csvdove_tmp_db.db'
         self.path = 'sqlite:///' + self.name
-
+        #self.path = 'sqlite:///' + ':memory:'
+        
         #table* - derive for each sourcefile
         self.table = 'seamless'
     
@@ -109,6 +111,9 @@ class DB(object):
         p.communicate(input = csv_data)
         
     def emigrate(self):
+        # db needs to persists between immigrate(), add_cols() and
+        # emigrate(). Solution: add file_obj args to these
+        # functions. (Better: have them operate on self.file_obj)
         cmd = 'sql2csv --db %s --query \"select * from %s\"' % (self.path, self.table)
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                              stdin=subprocess.PIPE, shell=True)
