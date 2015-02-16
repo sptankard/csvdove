@@ -60,8 +60,6 @@ class Target(object):
 # schema['sources'][0]['name']
 # schema['sources'][0]['name']
 
-
-
 sources = [
     
     dict(

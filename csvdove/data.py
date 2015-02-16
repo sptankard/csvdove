@@ -9,7 +9,7 @@
 As such, making schema config files is easier. The rest of the needed
 data is then derived from computing on this base info.
 '''
-
+import yaml
 from main import to_str
 # can prob move to_str into data for good
 
@@ -17,11 +17,6 @@ def subtract_lists(x, y):
     #alt but different: z = list(set(x) - set(y))
     z = [item for item in x if item not in y]
     return z
-
-def schema_from_file_path(file_path):
-    import yaml
-    c = yaml.load(file(file_path))
-    return Schema(c) 
 
 def search_schemas_dir():
     '''Returns a list of .yml files in ~/.csvdove/saved_schemas
@@ -66,11 +61,18 @@ class DataWrapper(object):
     
     A DataWrapper instance is provided as the arg to a Worker instance.
     '''
+    # note; parallelism is somewhat broken. Need to decide whether
+    # DataWrapper should call Schema and Source or SchemaFile and
+    # SourceFile.
     def __init__(self, schema_file, target_file, list_of_source_files):
-        self.schema = Schema(schema_file)
-        self.schema_file_path = schema_file # is this actually a path,
-                                            # or a file object?
-        
+
+        # is this inefficiently loading two file obj in memory at
+        # once? (one from the cli arg -c, then getting its name and
+        # reloading in SchemaFile.load()?)
+        self.schema_file_path = schema_file.name 
+        cf = SchemaFile(self.schema_file_path)
+        self.schema = cf.load()
+
         self.target_file = target_file
         
         self.source_files = []
@@ -88,19 +90,13 @@ class Schema(object):
     Loads a schema and instantiates a Target and a list of Sources.
     '''
     def __init__(self, schema_data):
-        # need to overhaul the dot notation vs dict access. ATM, it
-        # works in Target and Source but not in Schema. Wait for
-        # loading from yaml first...
-        
-        self.target = Target(schema_data.target)
-        #self.target = Target(schema_data['target'])
+
+        self.target = Target(schema_data['target'])
+
         self.sources = []
-        for each_source in schema_data.sources:        
-        #for each_source in schema_data['sources']:
+        for each_source in schema_data['sources']:
             s = Source(each_source, self.target)
             self.sources.append(s)
-
-#        self.s = self.sources[0] #hack to make it function for now
 
 class Target(object):
     '''Represents the target description from a schema.
@@ -169,20 +165,39 @@ class SourceFile(object):
         self.src_type = self.schema_corr.name
 
 class SchemaFile(object):
-    '''Represents a schema *configuration file*.
+    '''Stores information about a schema *configuration file*.
     Mainly for use by the GUI. (ATM, CLI only works with one schema
     file at a time. Maybe for -l, it will need.)
     The GUI will maintain a list of these objects, which can be active
     or not. The active schema file will have a Schema object loaded in
     memory.
 
+    SchemaFile should be instantiated on a file path.
+    The file should only be opened if SchemaFile.load() is called.
+
     '''
     def __init__(self, file_path):
-        #self.path = 'somewhere' + self.name
-        
+
         # When the GUI starts, it should create a bunch of SchemaFile
         # objects, one from each schema file path it has access to.
         # To start with, they should be inactive -- and the GUI
         # should then activate one of them.
+        self.path = file_path
         self.active = False
-         
+
+    def load(self):
+        # alt name: mk_schema_obj()
+        # alt name: open_schema_file(), load_schema_file()
+        self.active = True
+        
+        with open(self.path, 'r') as stream:
+            c = yaml.safe_load(stream)
+            return Schema(c) 
+
+    # ideally everything is a file obj from as early on as
+    # possible, but the GUI may reintroduce file path strings to the
+    # picture. Delete this function if not needed.
+    def schema_obj_from_file_path(file_path):
+        c = yaml.safe_load(file(file_path))
+        return Schema(c) 
+        

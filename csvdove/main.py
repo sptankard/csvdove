@@ -10,7 +10,8 @@ class CSVDove(object):
         import argparse
 
         desc = ''' CSV "dovetailing" utility.
-        Dovetails CSV (comma-separated values) files according to custom-defined schema.
+        Dovetails CSV (comma-separated values) files according to
+        custom-defined schema.
         Schema configuration files must contain info on one or more
         source(s), and one target format.
 
@@ -48,6 +49,7 @@ class CSVDove(object):
         sources) '''
         p.add_argument('-s, --sources', metavar='SOURCE',
                        nargs='+', action='store', dest='sources', help=hs)
+        # ? argparse.FileType('r')
 
         ho = 'file for CSV target output (on cli, defaults to STDOUT)'
         p.add_argument('-o', metavar='FILE', action='store',
@@ -95,7 +97,6 @@ class CSVDove(object):
             print 'Starting in GUI mode'
             #from gui import GUI
             #GUI(c=self.args.schema, s=self.args.sources, t=self.args.target)
-            # all optional args
             #gui.main()
 
         elif self.args.gen == True:
@@ -109,14 +110,8 @@ class CSVDove(object):
                 print fn         
 
         else:
-            # temporary - need to code yaml load_schema_file()
-            import config
-            self.args.schema = config
-
             from cli import CLI
             cli  = CLI(self.args.schema, self.args.sources, o=self.args.output)
-            # CLI init needs to take an (optional) output argument, which
-            # it should set default o=sys.stdout.
             cli.main()
 
 def to_str(a):
