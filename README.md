@@ -47,7 +47,6 @@ different from tools like [csvmerge]
 (https://github.com/defcube/csvmerge), or [csvkit's]
 (http://csvkit.rtfd.org/) [csvjoin]
 (http://csvkit.readthedocs.org/en/latest/scripts/csvjoin.html).
-
 csvdove does a different, smarter "merging" -- it actually uses (the
 totally awesome) csvkit on the backend.
 (I started csvdove because I tried to use those pre-existing tools to
@@ -59,7 +58,6 @@ different, and the rows are the same).
 csvdove is ideal for combining data sets that say the *same things*
 about **different** items (i.e., the columns are the same, but the
 rows are different).
-
 As such, it's a bit more like csvkit's [csvstack]
 (http://csvkit.readthedocs.org/en/latest/scripts/csvstack.html).
 However, csvdove goes a bit further: it can combine data sets even
@@ -84,8 +82,8 @@ For the technically oriented, there might be what you're looking for
 at [PyPI (search 'csv')]
 (https://pypi.python.org/pypi?%3Aaction=search&term=csv&submit=search).
 
-If it's not tabular data, you will probably want to look into quite
-different options.
+If it's not tabular data, well, you probably want to be reading
+something else right now.
 
 ### Making a schema configuration file
 
