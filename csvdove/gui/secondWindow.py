@@ -9,6 +9,7 @@ from gi.repository import Gtk
 
 
 class secondWindow(object):
+
     def __init__(self, parent, firstWin, builder):
         self.parent = parent
         self.firstWin = firstWin
@@ -17,12 +18,14 @@ class secondWindow(object):
         self.treeview = builder.get_object("treeview")
         self.entrytree = builder.get_object("entryTree")
         self.treestore = Gtk.TreeStore(str, str)
-        first_iter = self.treestore.append(None, ['Childs books', 'Zdenek Miler and Karel Capek'])
+        first_iter = self.treestore.append(
+            None, ['Childs books', 'Zdenek Miler and Karel Capek'])
         self.treestore.append(first_iter, ['Little Mole', 'Zdenek Miler'])
         self.treestore.append(first_iter, ['Dasenka', 'Karel Capek'])
         first_iter = self.treestore.append(None, ['Dramatic', 'Czech authors'])
         self.treestore.append(first_iter, ['RUR', 'Karel Capek'])
-        self.treestore.append(first_iter, ['The Makropolus Affair', 'Karel Capek'])
+        self.treestore.append(
+            first_iter, ['The Makropolus Affair', 'Karel Capek'])
         self.treeview.set_model(self.treestore)
         self.tvcolumn = Gtk.TreeViewColumn("Title and Author")
         title = Gtk.CellRendererText()
@@ -40,7 +43,8 @@ class secondWindow(object):
         select = selection.get_selection()
         (model, treeiter) = select.get_selected()
         if treeiter is not None:
-            self.entrytree.set_text("%s - %s" % (model[treeiter][1], model[treeiter][0]))
+            self.entrytree.set_text(
+                "%s - %s" % (model[treeiter][1], model[treeiter][0]))
 
     def open_window(self, widget, data=None):
         self.secondWindow.show_all()

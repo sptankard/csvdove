@@ -1,18 +1,19 @@
 class GUI(object):
-    #GUI needs to have optional args (-c, -s, -o)
-    #def __init__(self, **kwargs):
+    # GUI needs to have optional args (-c, -s, -o)
+    # def __init__(self, **kwargs):
+
     def __init__(self, c=None, s=None, o=autogen_output_path()):
-        #or s=[] ??
+        # or s=[] ??
 
         # N.B. should GUI expect c = str or file object? (or
         # datastruct?)
-        
+
         # collect the sysargs if they got explicitly passed on cli
         # If args were not provided on cli, define defaults for them.
-        
+
         self.file_output_path = o
         self.target_file = self.file_output_path
-        
+
         # default schema:
         # (1) if started with -c, use that path
         # otherwise, call default_schema_file()
@@ -29,14 +30,15 @@ class GUI(object):
 
         # GUI needs to create SchemaFile objs for all the file paths
         # it finds. Then, activate the selected one.
-        # 
+        #
         pass
-    
+
     def process(self):
         '''Gets called when 'Process' button is clicked.'''
         # you can only call process if you have all the args (means
         # have to check for SourceFiles and active SchemaFile)
-        data = DataWrapper(self.selected_schema_file, self.target_file, self.source_files_list)
+        data = DataWrapper(
+            self.selected_schema_file, self.target_file, self.source_files_list)
         from csvdove.worker import Dovetail
         d = Dovetail(data)
         d.main()
@@ -47,7 +49,7 @@ class GUI(object):
 
         '''
         pass
-    
+
     def rm_source_file(self):
         '''Gets called when user clicks 'Remove this file'. Needs to destroy
         the corresponding SourceFile object as well as remove from list.
@@ -62,14 +64,14 @@ class GUI(object):
         self.selected_schema_file = self.get_file_path_from_widget()
         from csvdove import data
         data.schema_from_file_path(self.selected_schema_file)
-    
+
         # Everytime you change a schema, it should reevaluate the
         # source files wrt the new schema file.
         # SourceFile implements this checking. So, on every schema
         # change, must reiterate through source file paths and make
         # new SourceFile objects for them.
 
-        #return Schema(s)  #where am i form???
+        # return Schema(s)  #where am i form???
 
     def add_schema_file(self):
         '''Called when user selects 'Add schema file...' (Schema selector
@@ -79,7 +81,7 @@ class GUI(object):
         # data.schema_from_file_path()
         # set schema to active
         # reevaluate src files wrt new schema
-        
+
         pass
 
     def rm_schema_file(self):
@@ -94,5 +96,3 @@ class GUI(object):
 
         '''
         pass
-
-    

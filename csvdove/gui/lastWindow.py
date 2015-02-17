@@ -11,7 +11,8 @@ from gi.repository import Gtk
 
 
 class lastWindow(object):
-    def __init__(self,  parent, secondWindow, builder):
+
+    def __init__(self, parent, secondWindow, builder):
         self.parent = parent
         self.secondWindow = secondWindow
         self.lastWindow = builder.get_object("lastWindow")

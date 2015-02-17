@@ -1,11 +1,15 @@
-import os, sys, subprocess
+import os
+import sys
+import subprocess
 #import six
 
 from os.path import abspath, dirname, join
-  
+
 WHERE_AM_I = abspath(dirname(__file__))
 
+
 class CSVDove(object):
+
     def __init__(self):
         import argparse
 
@@ -25,7 +29,7 @@ class CSVDove(object):
         including some built-in operations for dates etc., or
         applying any regexp.
         '''
-        
+
         p = argparse.ArgumentParser(prog='csvdove', description=desc)
 
         # Note: if you specify nargs, then you get a list. If you want
@@ -36,8 +40,9 @@ class CSVDove(object):
         # Maybe make --gen and --gui mutually exclusive. Also --gen
         # and -c. And -l vs everything else.
 
-        p.add_argument('-v, --version', action='version', version='%(prog)s 0.0.1')
-        
+        p.add_argument(
+            '-v, --version', action='version', version='%(prog)s 0.0.1')
+
         hgui = 'GUI mode'
         p.add_argument('--gui', action='store_true', help=hgui)
 
@@ -53,7 +58,7 @@ class CSVDove(object):
 
         ho = 'file for CSV target output (on cli, defaults to STDOUT)'
         p.add_argument('-o', metavar='FILE', action='store',
-                       dest='output', type=argparse.FileType('w'), 
+                       dest='output', type=argparse.FileType('w'),
                        default=sys.stdout, help=ho)
         # filetype w +b?
         # or default=None, ?
@@ -77,27 +82,26 @@ class CSVDove(object):
         source(s) and target format (requires -s and -t) '''
         p.add_argument('--gen', action='store_true',
                        help=hgen)
-        
+
         ht = 'CSV file to pattern for target format (for use with --gen)'
-        p.add_argument('-t, --target', metavar='TARGET', #nargs=1,
+        p.add_argument('-t, --target', metavar='TARGET',  # nargs=1,
                        action='store', dest='gen_t',
-                       type=argparse.FileType('r'), 
+                       type=argparse.FileType('r'),
                        help=ht)
-                
+
         hl = 'list the schemas that are cached for later use'
         p.add_argument('-l, --list-saved-schemas',
                        action='store_true', dest='list',
                        help=hl)
 
         self.args = p.parse_args()
-        
-        
+
     def main(self):
         if self.args.gui == True:
             print 'Starting in GUI mode'
             #from gui import GUI
             #GUI(c=self.args.schema, s=self.args.sources, t=self.args.target)
-            #gui.main()
+            # gui.main()
 
         elif self.args.gen == True:
             from worker import StarterSchemaGen
@@ -107,12 +111,13 @@ class CSVDove(object):
         elif self.args.list == True:
             import data
             for fn in data.search_schemas_dir():
-                print fn         
+                print fn
 
         else:
             from cli import CLI
-            cli  = CLI(self.args.schema, self.args.sources, o=self.args.output)
+            cli = CLI(self.args.schema, self.args.sources, o=self.args.output)
             cli.main()
+
 
 def to_str(a):
     str_enc = '\"'
@@ -130,7 +135,7 @@ td schema
 wpe schema
 
 need to handle csvstack (combining) output from each source to one file
-preferably, write to file (append each source) as we go, 
+preferably, write to file (append each source) as we go,
 rather than keeping everything in memory
 
 
@@ -154,7 +159,7 @@ every time a source file is added or removed in gui
 
 Data includes:
 Schema (for current schema file)
-Files 
+Files
 
 all changeable during GUI runtime:
 1 schema file

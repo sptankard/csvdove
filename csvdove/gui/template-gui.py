@@ -27,7 +27,7 @@ import firstWindow
 
 try:
     from gi.repository import Gtk
-except RuntimeError, e:
+except RuntimeError as e:
     print("devel-assistant requires a currently running X server.")
     print("%s: %r" % (e.__class__.__name__, str(e)))
     sys.exit(1)
