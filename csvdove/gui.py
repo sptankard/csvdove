@@ -1,3 +1,14 @@
+"""all changeable during GUI runtime:
+1 schema file
+* source files
+1 target file
+...this happens below the DataWrapper level
+
+GUI table view:
+welcome_text = 'Drag or drop CSV files here to dovetail them.'
+
+fields: file name, source type; remove button
+"""
 class GUI(object):
     # GUI needs to have optional args (-c, -s, -o)
     # def __init__(self, **kwargs):

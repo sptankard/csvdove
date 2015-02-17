@@ -32,9 +32,6 @@ class CSVDove(object):
 
         p = argparse.ArgumentParser(prog='csvdove', description=desc)
 
-        # Note: if you specify nargs, then you get a list. If you want
-        # to get a file object (or a str), leave it out.
-
         #dove = parser.add_mutually_exclusive_group()
 
         # Maybe make --gen and --gui mutually exclusive. Also --gen
@@ -139,48 +136,9 @@ TODO
 td schema
 wpe schema
 
-need to handle csvstack (combining) output from each source to one file
-preferably, write to file (append each source) as we go,
-rather than keeping everything in memory
-
-
-gui -- accept source files
-gui -- output target file, and say where it is
-
-load schema file from sysargs, from yaml file
-
 use csvkit classes rather than cli utilities
 profile dir
-list saved schemas
-saved schemas gui
+GUI
 
-detect input not conforming to source schemas
-
-
-initiate a Schema every time a schema file is selected (thru files)
-(switching schema files...)
-
-every time a source file is added or removed in gui
-
-Data includes:
-Schema (for current schema file)
-Files
-
-all changeable during GUI runtime:
-1 schema file
-* source files
-1 target file
-...this happens below the DataWrapper level
-
-GUI table view:
-welcome_text = 'Drag or drop CSV files here to dovetail them.'
-
-fields: file name, source type; remove button
-
-gui.selected_schema_file
-gui.source_files?
-
-retrive initial list from sysargs
-then, update (add/remove) as required
-
-'''
+detect input not conforming to source' schemas
+''
