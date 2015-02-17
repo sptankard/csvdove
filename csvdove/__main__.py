@@ -47,8 +47,13 @@ class CSVDove(object):
         p.add_argument('--gui', action='store_true', help=hgui)
 
         hc = 'schema configuration file (.yml)'
-        p.add_argument('-c, --schema', metavar='SCHEMA',
-                       action='store', dest='schema', type=argparse.FileType('r'), help=hc)
+        p.add_argument(
+            '-c, --schema',
+            metavar='SCHEMA',
+            action='store',
+            dest='schema',
+            type=argparse.FileType('r'),
+            help=hc)
 
         hs = ''' CSV file(s) to dovetail (or, if using --gen, to pattern as
         sources) '''
@@ -97,18 +102,18 @@ class CSVDove(object):
         self.args = p.parse_args()
 
     def main(self):
-        if self.args.gui == True:
+        if self.args.gui:
             print 'Starting in GUI mode'
             #from gui import GUI
             #GUI(c=self.args.schema, s=self.args.sources, t=self.args.target)
             # gui.main()
 
-        elif self.args.gen == True:
+        elif self.args.gen:
             from worker import StarterSchemaGen
             gen = StarterSchemaGen(self.args.gen_t.name, self.args.sources)
             gen.dump()
 
-        elif self.args.list == True:
+        elif self.args.list:
             import data
             for fn in data.search_schemas_dir():
                 print fn

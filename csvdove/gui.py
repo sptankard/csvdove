@@ -38,7 +38,9 @@ class GUI(object):
         # you can only call process if you have all the args (means
         # have to check for SourceFiles and active SchemaFile)
         data = DataWrapper(
-            self.selected_schema_file, self.target_file, self.source_files_list)
+            self.selected_schema_file,
+            self.target_file,
+            self.source_files_list)
         from csvdove.worker import Dovetail
         d = Dovetail(data)
         d.main()
