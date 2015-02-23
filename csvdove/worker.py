@@ -12,13 +12,23 @@ except:
         sys.exit(1)
 
 from csvdove.__main__ import to_str
-
+from tempfile import SpooledTemporaryFile
+ 
+def stream2fobj(stream):
+    """Takes a data stream and returns a file object. Temporary, for use
+    transitioning the way Restructure works.
+    """
+    max_size = 9900
+    fobj = SpooledTemporaryFile(max_size=max_size)
+    fobj.write(stream)
+    fobj.seek(0)
+    return fobj
 
 class Dovetail(object):
 
-    def __init__(self, schema_file, src_files, output_file):
+    def __init__(self, schema, src_files, output_file):
 
-        self.schema = schema_file
+        self.schema = schema
         self.source_files = src_files
         self.output_file = output_file
 
@@ -74,12 +84,36 @@ class DB(object):
 
     def immigrate(self, csv_data):
         self.clear()  # delete the db iff it already exists
-        cmd = 'csvsql --db %s --table %s --insert' % (self.path, self.table)
+        cmd = 'csvsql --no-inference --db %s --table %s --insert' % (self.path, self.table)
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                              stdin=subprocess.PIPE, shell=True)
         p.communicate(input=csv_data)
 
+    # def immigrateBetter(self, csv_data):
+    #     """(1) Use CSVQL to get create table statement.  (2) Execute create
+    #     table statement on a tmpf db.  (3) use sqlalchemy directly,
+    #     and csvkit's Table, to execute insert statement on tmpf db.
+    #     (4) Use SQL2CSV to export this tmpf db as CSV.
+
+    #     """
+    #     from tempfile import SpooledTemporaryFile
+    #     from csvkit.utilities.csvsql import CSVSQL
+
+    #     # get a create table statement
+    #     tmpf = SpooledTemporaryFile(max_size=1000) #how much?
+    #     csvsql = CSVSQL(output_file=tmpf)
+    #     csvsql.main()
+    #     # extract this statement from the file
+    #     create_table_statement = tmpf.read()
+
+
+    #     cmd = 'csvsql --db %s --table %s --insert' % (self.path, self.table)
+    #     p = subprocess.Popen(cmd, stdout=subprocess.PIPE,
+    #                          stdin=subprocess.PIPE, shell=True)
+    #     p.communicate(input=csv_data)
+
     def emigrate(self):
+        #         from csvkit.utilities.sql2csv import SQL2CSV
         # db needs to persists between immigrate(), add_cols() and
         # emigrate(). Solution: add file_obj args to these
         # functions. (Better: have them operate on self.file_obj)
@@ -101,19 +135,9 @@ class DB(object):
 
     def get_salvage_cols(self, salvage_info):
         pass
+    
 
-    def rename_cols(self, columns):
-        # goddamn sqlite don't support this shit. So for now it's
-        # implemented with python replace(), in Restructure
-        '''connection = sqlite.connect(db.name)
-        cursor = connection.cursor()
-        ...
-        #syntax: ALTER TABLE table_name RENAME COLUMN old_name to new_name;
-        sql_rename_cols = 'ALTER TABLE %s RENAME COLUMN \"%s\" to \"%s\"' % (table, key, val)
-        #cursor.execute(sql_rename_cols)
-        '''
-        pass
-
+from csvkit import table
 
 class Restructure(object):
 
@@ -140,24 +164,36 @@ class Restructure(object):
         # add missing (fill)
         pass
 
-    def rename_cols(self, matching, data):
-        '''rename the discrepancy headers
-        matching: a list of lists that match [source, target] cols
-        data: the csv-text data to operate on
-        '''
-        pairs = matching  # i have to get a list of tuples from the list
-        # prune out the ones that are already the same
-        pruned = [(key, val) for key, val in pairs if key != val]
-        header = data  # maybe restrict this to just first line
-        for key, val in pruned:
-            # problem: replacing with commas like this means it will
-            # not work on first or last column. Solution: use CSVHeader
-            # instead.
-            k = ',' + key + ','
-            v = ',' + val + ','
-            header = header.replace(k, v, 1)  # just replace once
-        return header
+    def rename_cols(self, match, csv_text):
+        # Better idea: this function takes a match-list and a Table
+        # object. It returns a Table object with the column names
+        # changed.
+       
+        # temporary, call to Table should be moved out when it's used
+        # everywhere. Where to instantiate the Tables? Not in
+        # SourceFile -- too much memory use. SourceFile should just
+        # provide file metadata and a file object. Reading/parsing to
+        # Table should be left to the Dovetail step. 
+        tab = table.Table.from_csv(stream2fobj(csv_text))
 
+        # don't bother renaming the cols that are already the same,
+        # just the ones that differ.
+        differing = [(src, tar) for src, tar in match if src != tar]
+        
+        # rename each column object in the table
+        for (src, tar) in differing:
+            for col in tab:
+                if col.name == src:
+                    col.name = tar
+
+        with SpooledTemporaryFile(max_size=9900) as out_f:        
+            # write out the header, and the text
+            tab.to_csv(out_f)
+
+            # return the both (header and data-text) together
+            out_f.seek(0)
+            return out_f.read().encode()
+        
     def order(self, ordering, data):
         # expects csv input with all requisite columns, in any order
         # returns csv data in desired order

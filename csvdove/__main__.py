@@ -15,7 +15,7 @@ class CSVDove(object):
 
         desc = ''' CSV "dovetailing" utility.
         Dovetails CSV (comma-separated values) files according to
-        custom-defined schema.
+        custom-defined schema
         Schema configuration files must contain info on one or more
         source(s), and one target format.
 
@@ -38,7 +38,7 @@ class CSVDove(object):
         # and -c. And -l vs everything else.
 
         p.add_argument(
-            '-v, --version', action='version', version='%(prog)s 0.0.1')
+            '-V, --version', action='version', version='%(prog)s 0.0.1')
 
         hgui = 'GUI mode'
         p.add_argument('--gui', action='store_true', help=hgui)
@@ -131,14 +131,10 @@ if __name__ == '__main__':
     dove = CSVDove()
     dove.main()
 
-'''
-TODO
-td schema
-wpe schema
 
-use csvkit classes rather than cli utilities
-profile dir
-GUI
+# TODO
+# use csvkit classes rather than cli utilities
+# profile dir
+# GUI
 
-detect input not conforming to source' schemas
-''
+# detect input not conforming to source' schemas

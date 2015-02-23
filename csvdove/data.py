@@ -1,4 +1,3 @@
-
 '''This setup reduces the basic data needed to:
 - full target list
 - full source list
@@ -115,6 +114,21 @@ class Schema(object):
             s = Source(each_source, self.target)
             self.sources.append(s)
 
+    def autogen_output_path(self):
+        '''Returns string of the sort: ~/TARGET_NAME.csvdove_DATETIME.csv
+
+        TARGET_NAME is based on the target definition name as per the
+        active schema.  GUI should call this every so often (10 secs?)
+        to update the path (time...).
+
+        '''
+        import time
+        ntar = self.target.name
+        appn = 'csvdove'  # %prog
+        dtm = time.strftime('%Y%m%d_%H:%M:%S')
+
+        file_output_path = '%s.%s_%s.csv' % (ntar, appn, dtm)
+        return file_output_path
 
 class Target(object):
 
@@ -125,23 +139,6 @@ class Target(object):
     def __init__(self, target):
         self.name = target['name']
         self.cols = target['cols']
-
-    def autogen_output_path():
-        '''maybe this should be handled in OutputFile class?
-
-        Returns string of the sort: ~/TARGET_NAME.csvdove_DATETIME.csv
-
-        It needs access to the target definition name as per the active schema.
-
-        '''
-        import time
-        tn = self.name
-        appn = 'csvdove'  # %prog
-        dt = time.strftime('%Y%m%d_%H:%M:%S')
-
-        file_output_path = '%s.%s_%s.csv' % (tn, appn, dt)
-        return file_output_path
-
 
 class Source(object):
 
@@ -189,13 +186,24 @@ class SourceFile(object):
         '''
         self.path = file_path
 
+        # with open(file_path, 'r') as f:
+        #     first_line = f.readline().rstrip()  # rstrip() removes \n
+        #     # can use CSVHeader here instead
+
+        # schema = schema_obj
+        # for src in schema.sources:
+        #     if src.jisser == first_line:
+        #         self.schema_corr = src
+        #     else:
+        #         self.is_in_schema = False
+
         with open(file_path, 'r') as f:
-            first_line = f.readline().rstrip()  # rstrip() removes \n
-            # can use CSVHeader here instead
+            from csvdove.handler import CSVHeader
+            header = CSVHeader(f)
 
         schema = schema_obj
         for src in schema.sources:
-            if src.jisser == first_line:
+            if src.cols == header:
                 self.schema_corr = src
             else:
                 self.is_in_schema = False
