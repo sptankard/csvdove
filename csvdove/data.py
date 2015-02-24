@@ -197,20 +197,32 @@ class SourceFile(object):
         #     else:
         #         self.is_in_schema = False
 
+        from csvkit import table
         with open(file_path, 'r') as f:
-            from csvdove.handler import CSVHeader
-            header = CSVHeader(f)
+            #with table.Table.from_csv(f) as tab:
+            tab = table.Table.from_csv(f)
+            headers = tab.headers()
 
-        schema = schema_obj
-        for src in schema.sources:
-            if src.cols == header:
+        # bit of nonsense to deal with the fact that csvkit Column does
+        # a good thing (gives dummy names to empty col names)
+        for i,value in enumerate(headers):
+            headers[i] = value.replace('_unnamed', '')
+
+        for src in schema_obj.sources:
+            if src.cols == headers:
                 self.schema_corr = src
+                self.src_type = self.schema_corr.name
+                break
             else:
-                self.is_in_schema = False
+                self.schema_corr = None
+                #self.no_match_in_schema = True
 
-        # i think this var isn't being used enough yet
-        self.src_type = self.schema_corr.name
-
+# bit of nonsense to force yaml to parse strings a unicode
+# cf. https://stackoverflow.com/questions/2890146/how-to-force-pyyaml-to-load-strings-as-unicode-objects
+def construct_yaml_str(self, node):
+    # Override the default string handling function 
+    # to always return unicode objects
+    return self.construct_scalar(node)
 
 class SchemaFile(object):
 
@@ -235,6 +247,11 @@ class SchemaFile(object):
         self.path = file_path
         self.active = False
 
+        # force yaml to load strings as unicode
+        from yaml import Loader, SafeLoader
+        Loader.add_constructor(u'tag:yaml.org,2002:str', construct_yaml_str)
+        SafeLoader.add_constructor(u'tag:yaml.org,2002:str', construct_yaml_str)
+
     def load(self):
         # alt name: mk_schema_obj()
         # alt name: open_schema_file(), load_schema_file()
@@ -250,3 +267,4 @@ class SchemaFile(object):
     def schema_obj_from_file_path(file_path):
         c = yaml.safe_load(file(file_path))
         return Schema(c)
+

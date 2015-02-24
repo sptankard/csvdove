@@ -1,4 +1,4 @@
-import os
+import os, sys
 import subprocess
 
 try:
@@ -37,23 +37,26 @@ class Dovetail(object):
         db = DB()
 
         for each_file in self.source_files:
-            keeper_data = restructure.prune(
-                each_file.schema_corr.keep, each_file.path)
-            db.immigrate(keeper_data)
+            try:
+                keeper_data = restructure.prune(
+                    each_file.schema_corr.keep, each_file.path)
+                db.immigrate(keeper_data)
 
-            db.add_cols(each_file.schema_corr.add)
+                db.add_cols(each_file.schema_corr.add)
 
-            csv = db.emigrate().encode()
+                csv = db.emigrate().encode()
 
-            renamed = restructure.rename_cols(each_file.schema_corr.match, csv)
-            ordered = restructure.order(self.schema.target.cols, renamed)
+                renamed = restructure.rename_cols(each_file.schema_corr.match, csv)
+                ordered = restructure.order(self.schema.target.cols, renamed)
 
-            db.clear()
-            # db deletion should be in-loop: db is only used to process each
-            # src file
+                db.clear()
+                # db deletion should be in-loop: db is only used to process each
+                # src file
 
-            self.output_file.write(ordered)
-
+                self.output_file.write(ordered)
+                
+            except AttributeError as err:
+                sys.stderr.write('File "%s" has no match in the schema, and will be skipped.\n' % each_file.path)
 
 class DB(object):
 
@@ -165,15 +168,11 @@ class Restructure(object):
         pass
 
     def rename_cols(self, match, csv_text):
-        # Better idea: this function takes a match-list and a Table
-        # object. It returns a Table object with the column names
-        # changed.
-       
-        # temporary, call to Table should be moved out when it's used
-        # everywhere. Where to instantiate the Tables? Not in
-        # SourceFile -- too much memory use. SourceFile should just
-        # provide file metadata and a file object. Reading/parsing to
-        # Table should be left to the Dovetail step. 
+        """This function takes a match-list and a Table object. It returns a
+        Table object with the column names changed.
+
+        """
+
         tab = table.Table.from_csv(stream2fobj(csv_text))
 
         # don't bother renaming the cols that are already the same,
@@ -185,6 +184,8 @@ class Restructure(object):
             for col in tab:
                 if col.name == src:
                     col.name = tar
+
+        #return tab
 
         with SpooledTemporaryFile(max_size=9900) as out_f:        
             # write out the header, and the text
