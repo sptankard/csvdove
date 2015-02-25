@@ -43,8 +43,7 @@ class Dovetail(object):
                 db.immigrate(keeper_data)
 
                 db.add_cols(each_file.schema_corr.add)
-
-                csv = db.emigrate().encode()
+                csv = db.emigrate()
 
                 renamed = restructure.rename_cols(each_file.schema_corr.match, csv)
                 ordered = restructure.order(self.schema.target.cols, renamed)
@@ -193,7 +192,7 @@ class Restructure(object):
 
             # return the both (header and data-text) together
             out_f.seek(0)
-            return out_f.read().encode()
+            return out_f.read()
         
     def order(self, ordering, data):
         # expects csv input with all requisite columns, in any order
