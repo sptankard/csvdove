@@ -17,6 +17,12 @@ where, what to leave out, etc.), and several source datasets, which it
 processes and spits out in the desired format. (It can also be used on
 a single file, to rename, delete and reorder columns.)
 
+### TODO
+
+* Rewrite the existing codebase to use [mcm]
+  (https://github.com/buildingenergy/mcm-core/) as the backend
+* Make a GUI
+
 ### What to use it for?
 
 csvdove is ideal for automating a repetitive, boring data-merging task
@@ -129,7 +135,7 @@ A schema file has two main sections: `sources` and `target`. `sources`
 contains a list of different sources. You must edit the entry for each
 of these sources to describe whats bits of the source data should end
 up where in the target file. This information is given in the `match`
-section of each source description. 
+section of each source description.
 
 Within `match`, ...
 

@@ -172,7 +172,7 @@ class Restructure(object):
 
         """
 
-        tab = table.Table.from_csv(stream2fobj(csv_text))
+        tab = table.Table.from_csv(stream2fobj(csv_text))#, infer_types=False)
 
         # don't bother renaming the cols that are already the same,
         # just the ones that differ.
